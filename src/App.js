@@ -19,21 +19,20 @@ export default () => {
   }, []);
 
   useEffect(() => {
-    if (fluidMap !== undefined) {
-      // sync Fluid data into view state
-      const syncView = () => {
-        setTasks(fluidMap.get(todoKey));
-        setFormInput(fluidMap.get(inputKey));
-      };
-      // ensure sync runs at least once
-      syncView();
-      // update state each time our map changes
-      fluidMap.on("valueChanged", syncView);
-      // turn off listener when component is unmounted
-      return () => {
-        fluidMap.off("valueChanged", syncView);
-      };
-    }
+    if (fluidMap === undefined) return;
+    // sync Fluid data into view state
+    const syncView = () => {
+      setTasks(fluidMap.get(todoKey));
+      setFormInput(fluidMap.get(inputKey));
+    };
+    // ensure sync runs at least once
+    syncView();
+    // update state each time our map changes
+    fluidMap.on("valueChanged", syncView);
+    // turn off listener when component is unmounted
+    return () => {
+      fluidMap.off("valueChanged", syncView);
+    };
   }, [fluidMap]);
 
   const handleChange = (e) => {
@@ -42,25 +41,20 @@ export default () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formInput !== "") {
-      const date = new Date().toLocaleDateString();
-      const newTask = {
-        date: date,
-        task: formInput,
-        completed: false,
-      };
-      setTodo([...tasks, newTask]);
-      setInput("");
-    }
+    if (formInput == "") return;
+    const date = new Date().toLocaleDateString();
+    const newTask = {
+      date: date,
+      task: formInput,
+      completed: false,
+    };
+    setTodo([...tasks, newTask]);
+    setInput("");
   };
 
   const handleComplete = (index) => {
     const newTasks = [...tasks];
-    if (newTasks[index].completed === false) {
-      newTasks[index].completed = true;
-    } else {
-      newTasks[index].completed = false;
-    }
+    newTasks[index].completed = !newTasks[index].completed;
     setTodo(newTasks);
   };
 
